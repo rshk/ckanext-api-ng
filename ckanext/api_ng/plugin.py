@@ -7,11 +7,12 @@
 # except ImportError:
 #     from ordereddict import OrderedDict
 
-from ckan.plugins import (implements, SingletonPlugin,
-                          IConfigurable, IRoutes)
-import ckan.lib.base as base
+from ckan.plugins import implements, SingletonPlugin, IRoutes
+# import ckan.lib.base as base
 # import ckan.plugins.toolkit as plugins_toolkit
 import routes.mapper as routes_mapper
+
+from ckanext.api_ng.api_controller import ApiNgController
 
 
 ## We would put this in the main ckan configuration, but
@@ -43,9 +44,18 @@ class ApiNgPlugin(SingletonPlugin):
 
     def before_map(self, routes):
         controller = 'ckanext.api_ng.plugin:ApiNgController'
+
+        #-------------------------------------------------------------------------------- # noqa
+        # 120     with SubMapper(map, controller='api', path_prefix='/api{ver:/3|}',      # noqa
+        # 121                    ver='/3') as m:
+        # 122         m.connect('/action/{logic_function}', action='action',
+        # 123                   conditions=GET_POST)
+        #-------------------------------------------------------------------------------- # noqa
+
+        ## This should do (pretty much)
         with routes_mapper.SubMapper(routes, controller=controller) as m:
-            m.connect('api_endpoint', '/api/ng/{path_info:.*}',
-                      action='api_endpoint')
+            #m.connect('/api/ng/{path_info:.*}', action='action')
+            m.connect('/api/ng/{logic_function}', action='action')
 
             # for name in ['package_list', 'package_get']:
             #     page_slug = name.replace('_', '-')
@@ -55,10 +65,3 @@ class ApiNgPlugin(SingletonPlugin):
 
     def after_map(self, routes):
         return routes
-
-
-class ApiNgController(base.BaseController):
-    """Controller for the new API"""
-
-    def api_endpoint(self, path_info=None):
-        return "Hello, world! " + path_info
