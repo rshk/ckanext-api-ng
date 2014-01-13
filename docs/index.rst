@@ -6,11 +6,13 @@
 Welcome to Ckan API NG's documentation!
 =======================================
 
-Contents:
+Public API documentation:
 
 .. toctree::
    :maxdepth: 2
 
+   api/index
+   api/endpoints
 
 
 Indices and tables
