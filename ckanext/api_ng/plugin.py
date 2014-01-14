@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ##------------------------------------------------------------
-## Ckan New Generation API for Ckan 2.2
+## Ckan New Generation API (for Ckan 2.2)
 ##------------------------------------------------------------
 
 from ckan.plugins import implements, SingletonPlugin, IRoutes

@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-import sys
 
 version = '0.1.1'
 
@@ -9,9 +8,7 @@ entry_points = {
     ],
 }
 
-install_requires = []
-if sys.version_info < (2, 7):
-    install_requires.append('ordereddict')
+install_requires = ['itsdangerous']
 
 setup(
     name='ckanext-api-ng',
@@ -27,6 +24,6 @@ setup(
     namespace_packages=['ckanext', 'ckanext.api_ng'],
     include_package_data=True,
     zip_safe=False,
-    install_requires=[],
+    install_requires=install_requires,
     entry_points=entry_points,
 )
