@@ -2,7 +2,7 @@
 ## New API controller, forked from v3 core API
 ##
 
-from __future__ import division
+from __future__ import division, absolute_import
 
 import json
 import logging
@@ -18,6 +18,9 @@ import ckan.lib.navl.dictization_functions
 import ckan.lib.plugins
 import ckan.logic as logic
 import ckan.model as model
+
+from .new_logic import get_db_cursor
+from .new_logic.auth import authenticate_request
 
 
 log = logging.getLogger(__name__)
@@ -53,6 +56,20 @@ def _format_link_header(links):
     return ', '.join(_links)
 
 
+def check_auth(perm):
+    from functools import wraps
+
+    def decorator(func):
+        @wraps(func)
+        def wrapped(self, *a, **kw):
+            user = self._authenticate()
+            perm_name = perm.format(*a, **kw)
+            if not self._check_authz(user, perm_name):
+                raise HTTPBadRequest("Not authorized to perform this action.")
+        return wrapped
+    return decorator
+
+
 class ApiNgController(BaseController):
     """
     Custom controller for the API.
@@ -84,99 +101,55 @@ class ApiNgController(BaseController):
             path += '?' + urllib.urlencode(args)
         return path
 
-    def _get_db_connection_params(self):
-        from pylons import config
-        import urlparse
-        db_url = config.get('sqlalchemy.url')
-        db_url_parts = urlparse.urlparse(db_url)
-        if db_url_parts.scheme != 'postgresql':
-            raise ValueError("Invalid database scheme: " + db_url_parts.scheme)
-        user_pass, host_port = db_url_parts.netloc.split('@')
-        user, password = user_pass.split(':')
-        if ':' in host_port:
-            host, port = host_port.split(':')
-            port = int(port)
-        else:
-            host, port = host_port, 5432
-        dbname = db_url_parts.path.strip('/').split('/')[0]
-        return dict(
-            database=dbname,
-            user=user,
-            password=password,
-            host=host,
-            port=port)
-
-    def _get_db(self):
-        import psycopg2
-        params = self._get_db_connection_params()
-        return psycopg2.connect(**params)
-
-    def _get_db_cursor(self):
-        import psycopg2.extras
-        return self._get_db().cursor(cursor_factory=psycopg2.extras.DictCursor)
-
     def _authenticate(self):
         """
-        Figure out the user name and check that signature is valid.
-
-        .. note::
-            This will only work for "sysadmin" users, as there isn't any
-            authorization check in place, at the moment..
-
         :return:
-            the user object (as dict or dict-like), or None if the
-            user is not authenticated.
+            - User info (dict) if authentication was successful
+            - None if not authentication was provided
+        :raises:
+            - HTTPForbidden if login failed
+            - HTTPBadRequest if an unsupported auth method was requested
         """
-        import base64
+        return authenticate_request(request)
 
-        auth_header = request.headers.get('Authorization')
-        if not auth_header:
-            return None  # Not authenticated
+    def _check_authz(self, user, action, obj=None):
+        """
+        Check authorization to perform an operation.
 
-        auth_type, auth_payload = auth_header.split(' ', 1)
+        :param user: the user object that want to perform the operation
+        :param action: the action to be performed, composed of one of
+            ('read', 'create', 'update', 'delete') and an object type.
+        :param obj: target object, when applicable
+        """
+        if user is None:
+            ## Anonymous can read everything, write nothing
+            method = action.split(':')[0]
+            return method == 'read'
 
-        if auth_type == 'Signature':
-            raise NotImplementedError(
-                "Signature authentication is not implemented yet")
+        if user['sysadmin']:
+            ## Sysadmins can do anything
+            return True
 
-            # from itsdangerous import Signer
-            # username, signature = base64.decodestring(auth_payload).split(':')  # noqa
-            # cur = self._get_db_cursor()
-            # cur.execute('SELECT * FROM "user" WHERE name=%s AND sysadmin=True')  # noqa
-            # user_obj = cur.fetchone()
-            # if not user_obj:
-            #     raise HTTPForbidden("Invalid username or signature")
+        ## todo: add further permission checking
 
-            # ## Verify HMAC signature with user key
-            # s = Signer(user_obj['apikey'])
-            # itsok = s.verify_signature(request.body, signature)
-            # if not itsok:
-            #     raise HTTPForbidden("Invalid username or signature")
-
-            # ## Let's just return the user object (dict-like)
-            # return user_obj
-
-        elif auth_type == 'Basic':
-            ## Perform basic HTTP authentication, with ``user:apikey``
-            ## base64(user:key)
-            username, apikey = base64.decodestring(auth_payload).split(':')
-            cur = self._get_db_cursor()
-            cur.execute("""
-            SELECT id, name, apikey, fullname, email, sysadmin
-            FROM "user"
-            WHERE name=%(username)s AND state='active' AND sysadmin=True;
-            """, dict(username=username,))
-            user_obj = cur.fetchone()
-            if (not user_obj) or (user_obj['apikey'] != apikey):
-                raise HTTPForbidden("Invalid username or API key")
-            return dict(user_obj)
-
-        else:
-            raise HTTPBadRequest(
-                "Unsupported authentication method: " + auth_type)
+        return False
 
     @staticmethod
     def _get_paging_info(start, size, total):
+        """
+        Calculate pagination information (links to pages)
+
+        :param start: current first item
+        :param size: current page size
+        :param total: total amount of items
+        :return: a dict with the following keys:
+            - ``first``  - "start" for the first page
+            - ``prev``  - "start" for the prev page (if not already
+                on the first page)
+            - ``next``  - "start" for the next page (if not already
+                on the last page)
+            - ``last``  - "start" for the last page
+        """
         import math
         total_pages = int(math.ceil(total / size))
         current_page = int(start / size)
@@ -229,39 +202,13 @@ class ApiNgController(BaseController):
         except AttributeError:
             raise HTTPNotFound()
 
-        # ## Let's try to figure out which parameters are expected by the
-        # ## method..
-        # import inspect
-        # method_argspec = inspect.getargspec(method)
-        # args = method_argspec.args[1:]  # remove 'self' (and make a copy)
-
-        # # Make space for positional arguments
-        # for a in method_args:
-        #     args.pop(0)
-
-        # ## Now, we want to populate kwargs with attributes that might
-        # ## be needed. If the function accepts generic kwargs, we will
-        # ## just pass them all. Otherwise, we only return what is
-        # ## actually needed..
-
-        # extra_args = {
-        #     'user': lambda: self._authenticate(),
-        #     'context': lambda: self._get_context(),
-        # }
-
-        # kwargs = {}
-        # if method_argspec.keywords is not None:
-        #     args = list(extra_args.iterkeys())
-        # for a in args:
-        #     kwargs[a] = extra_args[a]()
-
         ## Actually call the method
         retval = method(*method_args)
 
         ## todo: we need to catch HTTPErrors in order to serialize them
         ##       as json properly!
         ## todo: we also want to properly return 400/500s depending on
-        ##       when an unhandled error occurred
+        ##       when an unhandled error occurred (how?)
 
         raw_data, status, headers = self._process_response(retval)
 
@@ -273,30 +220,32 @@ class ApiNgController(BaseController):
         response.headers['Content-Type'] = 'application/json'
         return data
 
-    def _process_response(self, response):
+    def _process_response(self, retval):
         """
-        :param response: a response as returned by an API method
-        :return: a three-tuple in the format ``(data, status, headers)``
+        :param retval:
+            return value from an "action" method
+        :return:
+            a three-tuple: ``(data, status, headers)``
         """
 
-        if isinstance(response, tuple):
-            if len(response) == 1:
-                data, status, headers = response, 200, {}
-            elif len(response) == 2:
-                data, status = response
+        if isinstance(retval, tuple):
+            if len(retval) == 1:
+                data, status, headers = retval, 200, {}
+            elif len(retval) == 2:
+                data, status = retval
                 headers = {}
-            elif len(response) == 3:
-                data, status, headers = response
+            elif len(retval) == 3:
+                data, status, headers = retval
             else:
                 raise ValueError(
-                    "Invalid response: if a tuple, must have 1 to 3 elements")
+                    "Invalid retval: if a tuple, must have 1 to 3 elements")
             if not isinstance(status, int):
                 raise TypeError("Invalid status code: must be an integer")
             if not isinstance(headers, dict):
                 raise TypeError("Invalid headers: must be a dict")
             return data, status, headers
         else:
-            return response, 200, {}
+            return retval, 200, {}
 
     def _find_methods(self):
         """Find methods suitable to be exposed through the API"""
@@ -345,6 +294,7 @@ class ApiNgController(BaseController):
         ## Do not set CORS headers on every page!!
         pass
 
+    @check_auth('read:help')
     def get_help_index(self):
         """Return documentation about available API resources"""
 
@@ -359,6 +309,7 @@ class ApiNgController(BaseController):
 
         return method_docs
 
+    @check_auth('read:help')
     def get_help(self, res_id):
         """Get help about a given api call"""
 
@@ -373,10 +324,13 @@ class ApiNgController(BaseController):
             'title': ' '.join(self._expand_method_name(res_id)),
         }
 
+    @check_auth('read:info')
     def get_info_index(self):
         """Return some information about the current state"""
 
         user = self._authenticate()
+        if not self._check_authz(user, 'read', 'info:index'):
+            pass
 
         # remove "confidential" information!
         user.pop('apikey', None)
@@ -387,6 +341,7 @@ class ApiNgController(BaseController):
         }
         return info
 
+    @check_auth('read:package:index')
     def get_package_index(self):
         """
         Return list of packages (datasets).
@@ -427,9 +382,11 @@ class ApiNgController(BaseController):
 
         return result['results'], 200, headers
 
+    @check_auth('read:package:id={0}')
     def get_package(self, res_id):
         pass
 
+    @check_auth('create:package')
     def post_package_index(self):
         """
         Create a new dataset.
@@ -477,23 +434,38 @@ class ApiNgController(BaseController):
 
         return data
 
+    @check_auth('update:package:id={0}')
     def put_package(self, res_id):
         pass
 
+    @check_auth('update:package:id={0}')
     def patch_package(self, res_id):
         pass
 
+    @check_auth('delete:package:id={0}')
     def delete_package(self, res_id):
         pass
 
-    # def get_hello_index(self):
-    #     return 'hello ' + str(request.params)
+    ## Vocabulary CRUD
+    ##------------------------------------------------------------
 
-    # def post_hello_index(self):
-    #     return 'HELLO'
+    def get_vocabulary_index(self):
+        from .new_logic.tag import list_vocabularies
+        return list_vocabularies()
 
-    # def get_400(self):
-    #     raise HTTPBadRequest('you did something wrong')
+    def get_vocabulary(self, res_id):
+        from .new_logic.tag import read_vocabulary_by_name
+        return read_vocabulary_by_name(res_id)
 
-    # def get_402(self):
-    #     return 'hello', 403, {'x-reason': 'notauthorized'}
+    def post_vocabulary_index(self):
+        from .new_logic.tag import create_vocabulary
+        vocabulary_id = create_vocabulary()
+        pass
+
+    def put_vocabulary(self):
+        pass
+
+    def delete_vocabulary(self, res_id):
+        from .new_logic.tag import read_vocabulary, delete_vocabulary
+        vocab = read_vocabulary(res_id)
+        delete_vocabulary(vocab['id'])
