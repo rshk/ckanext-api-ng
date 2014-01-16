@@ -26,8 +26,9 @@ def authenticate_request(request):
         ## Perform basic HTTP authentication, with ``user:apikey``
         ## base64(user:key)
         username, apikey = base64.decodestring(auth_payload).split(':')
+        return basic_authentication(username, apikey)
 
-    raise HTTPBadRequest("Unsupported authorization method: {0}"
+    raise HTTPBadRequest("Unsupported authorization method: {0!r}"
                          .format(auth_type))
 
 
