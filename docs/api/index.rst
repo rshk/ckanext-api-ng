@@ -1,7 +1,8 @@
 Introduction
 ############
 
-.. todo:: write this
+The API is somehow in between a RESTful and a RPC-like API, mainly
+to provide compatibility for clients not supporting 100% of the HTTP.
 
 
 Serialization format(s)
