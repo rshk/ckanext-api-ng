@@ -7,52 +7,69 @@ import ckan.model
 from ckan.logic import check_access
 
 from sqlalchemy import and_
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, func
 from sqlalchemy.orm import aliased
 
 from . import DEFAULT_PAGE_SIZE, get_context
 from . import get_db_cursor
 
 
-def list_packages(size=DEFAULT_PAGE_SIZE, start=0):
+READABLE_PACKAGE_FIELDS = set([
+    'id', 'name', 'title',
+    'author', 'author_email', 'license_id', 'maintainer',
+    'maintainer_email', 'notes', 'owner_org', 'type', 'url',
+])
+DEFAULT_PACKAGE_FIELDS = ['id', 'name', 'title']
+
+
+def list_packages(size=DEFAULT_PAGE_SIZE, start=0, fields=None):
     """
     Returns a list of package names
 
     :param int size: pagination size
     :param int start: pagination start
+    :param list fields: list of field names to return
     :return: a dict with the following keys:
         * results: a list of package names
         * total: the total amount of packages matching query
         * start, size: actual pagination arguments that were
           used (in case there is an enforced maximum limit, ..)
     """
+    from ckan.model.package import package_revision_table
 
-    cur = get_db_cursor()
+    if fields is None:
+        fields = DEFAULT_PACKAGE_FIELDS
 
-    ## Get results page
-    limiting = ''
+    if 'all' in fields:
+        fields = READABLE_PACKAGE_FIELDS
+    else:
+        fields = filter(lambda x: x in READABLE_PACKAGE_FIELDS, fields)
+
+    query = select([getattr(package_revision_table.c, name)
+                   for name in fields])
+
+    where_clause = and_(
+        package_revision_table.c.current == True,  # noqa
+        package_revision_table.c.private == False,  # noqa
+        package_revision_table.c.state == 'active',
+    )
+
+    query = query.where(where_clause)
+
     if size is not None:
-        limiting = 'LIMIT {0:d} OFFSET {1:d}'.format(size, start)
-    res = cur.execute("""
-    SELECT "name" FROM "package_revision"
-    WHERE state='active' AND current=True AND private=False
-    ORDER BY name ASC
-    """ + limiting)
-    results_page = [r['name'] for r in cur.fetchall()]
+        query = query.limit(size).offset(start)
+    results_page = [dict(x) for x in query.execute()]
 
-    ## Get total count of records
-    res = cur.execute("""
-    SELECT count(*) AS cnt
-    FROM "package_revision"
-    WHERE state='active' AND current=True AND private=False
-    """)
-    total_count = res.fetchone()['cnt']
+    total_count = (select([func.count(package_revision_table.c.id)])
+                   .where(where_clause)
+                   .execute().first()[0])
 
     return {
         'results': results_page,
         'total': total_count,
         'start': start,
         'size': size,
+        'fields': fields,
     }
 
 
