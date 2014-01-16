@@ -4,6 +4,7 @@
 
 from __future__ import division, absolute_import
 
+import datetime
 import json
 import logging
 import urllib
@@ -66,6 +67,7 @@ def check_auth(perm):
             perm_name = perm.format(*a, **kw)
             if not self._check_authz(user, perm_name):
                 raise HTTPBadRequest("Not authorized to perform this action.")
+            return func(self, *a, **kw)
         return wrapped
     return decorator
 
@@ -216,9 +218,19 @@ class ApiNgController(BaseController):
         response.status_int = status
 
         ## todo: check the appropriate serialization format..
-        data = json.dumps(raw_data)
-        response.headers['Content-Type'] = 'application/json'
+        # data = json.dumps(raw_data)
+        data = self._serialize_data(raw_data)
+        response.headers['Content-Type'] = 'application/json; charset=utf-8'
         return data
+
+    @staticmethod
+    def _json_default(o):
+        if isinstance(o, datetime.datetime):
+            return o.strftime('%F %T')
+        raise TypeError
+
+    def _serialize_data(self, data):
+        return json.dumps(data, default=self._json_default)
 
     def _process_response(self, retval):
         """
@@ -328,11 +340,8 @@ class ApiNgController(BaseController):
     def get_info_index(self):
         """Return some information about the current state"""
 
-        user = self._authenticate()
-        if not self._check_authz(user, 'read', 'info:index'):
-            pass
-
         # remove "confidential" information!
+        user = self._authenticate()
         user.pop('apikey', None)
         user.pop('password', None)
 
@@ -349,6 +358,7 @@ class ApiNgController(BaseController):
         :param start:
         :param size:
         """
+
         from .new_logic.package import list_packages
 
         # self._check_access('package_list')
@@ -362,15 +372,47 @@ class ApiNgController(BaseController):
         ## Cap page size
         page_size = max(MIN_PAGE_SIZE, min(page_size, MAX_PAGE_SIZE))
 
+        ## Field names
+        requested_fields = db_fields = None  # default set
+        add_links = False  # whether to add links to items
+        if 'fields' in request.params:
+            requested_fields = request.params.getone('fields').split(',')
+            db_fields = list(requested_fields)  # copy
+
+        ## We always want to get object id
+        if db_fields is not None:
+            if 'id' not in db_fields:
+                db_fields.append('id')
+
+            ## The "link" field is generated
+            if 'link' in db_fields:
+                add_links = True
+                db_fields.remove('link')
+
         ## Actually list packages
-        result = list_packages(size=page_size, start=page_start)
+        result = list_packages(size=page_size, start=page_start,
+                               fields=db_fields)
+
+        if add_links:
+            for res in result['results']:
+                res['link'] = self._url('package/{0}'.format(res['id']))
+
+        ## If only one field between (id, name, link) was required,
+        ## just return it alone in a list
+        if requested_fields is not None:
+            if len(requested_fields) == 1 \
+                    and (requested_fields[0] in ('id', 'name', 'link')):
+                result['results'] = [
+                    r[requested_fields[0]] for r in result['results']]
 
         ## Prepare the Link: header
         links = {}
         paging_info = self._get_paging_info(
             result['start'], result['size'], result['total'])
         for key, value in paging_info.iteritems():
-            links[key] = self._url('package', start=value, size=result['size'])
+            links[key] = self._url(
+                'package', start=value, size=result['size'],
+                fields=','.join(result['fields']))
 
         ## Prepare all headers
         headers = {
@@ -449,22 +491,27 @@ class ApiNgController(BaseController):
     ## Vocabulary CRUD
     ##------------------------------------------------------------
 
+    @check_auth('read:vocabulary')
     def get_vocabulary_index(self):
         from .new_logic.tag import list_vocabularies
         return list_vocabularies()
 
+    @check_auth('read:vocabulary:id={0}')
     def get_vocabulary(self, res_id):
         from .new_logic.tag import read_vocabulary_by_name
         return read_vocabulary_by_name(res_id)
 
+    @check_auth('create:vocabulary')
     def post_vocabulary_index(self):
         from .new_logic.tag import create_vocabulary
         vocabulary_id = create_vocabulary()
         pass
 
+    @check_auth('update:vocabulary')
     def put_vocabulary(self):
         pass
 
+    @check_auth('delete:vocabulary:id={0}')
     def delete_vocabulary(self, res_id):
         from .new_logic.tag import read_vocabulary, delete_vocabulary
         vocab = read_vocabulary(res_id)
