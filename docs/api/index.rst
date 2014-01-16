@@ -37,18 +37,40 @@ Sorting
 Authentication
 ==============
 
-Authentication is done by passing a user's API key through the ``Authorization:``
-header.
+Right now, the only supported authentication method is ``Basic`` http authentication,
+on username + api key.
 
-  .. warning::
-    Since we want to support different authentication mechanisms in the future,
-    you should pass ``api-key=<your-key>`` in the ``Authorization`` header,
-    not just the key as with the v3 API.
+While this kind of authentication is supported by most clients, it can be recreated
+by setting the ``Authorization:`` header to ``Basic {value}`` where ``{value}`` is
+the base-64 encoded representation of ``username:apikey``.
 
 There are plans for some "better" authentication mechanism, that doesn't send
 the "private" API key along with each request, but instead uses it to sign
 requests (via something like `itsdangerous <http://pythonhosted.org/itsdangerous/>`_,
 or HMAC signature anyways..).
+
+
+Fields selection
+================
+
+Most "index" pages allow fields selection. This is done by specifying a comma-separated
+list of field names in the ``?fields=`` argument.
+
+Special cases
+-------------
+
+* The ``link`` field is "virtual": if requested for, it will be the (relative) link
+  to the object itself, where applicable.
+* If just **one** field is requested, and it is one of ``id``, ``name`` or ``link``,
+  just a list of that field values will be returned, instead of a list of dictionaries.
+* You can specify ``all`` to mean "all fields". This can be of course combined with
+  ``link``, to get links in addition to all fields.
+
+
+RDF and Json-LD
+===============
+
+This part is Work in progress, and decisions must be made about it.
 
 
 Compatibility
