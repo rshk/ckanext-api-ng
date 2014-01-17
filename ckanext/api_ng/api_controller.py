@@ -43,17 +43,50 @@ def get_api_prefix():
 
 def _format_link_header(links):
     """
-    Format a dictionary into value suitable for a ``Link:`` header.
+    Format a multipart "Link" header content.
 
-    >>> _format_link_header({'hello': 'http://example.com'})
-    <http://example.com>; rel=hello
+    :param links:
+        links in a format similar to the one returned
+        by Python requests, for example::
+
+            {'first': {'rel': 'first',
+              'url': '/api/ng/package?page=0'},
+             'last': {'rel': 'last',
+              'url': '/api/ng/package?page=10'},
+             'next': {'rel': 'next',
+              'url': '/api/ng/package?page=3'},
+             'prev': {'rel': 'prev',
+              'url': '/api/ng/package?page=1'}}
     """
+
+    def iter_links_dict(links):
+        for key, value in links.iteritems():
+            if isinstance(value, basestring):
+                value = {'url': value}
+            value = value.copy()
+            value['rel'] = key
+            yield value
+
+    def iter_links_list(links):
+        for link in links:
+            if not isinstance(link, dict):
+                raise ValueError("links must be a list of dicts")
+            yield link
+
+    def iter_links(links):
+        if isinstance(links, dict):
+            return iter_links_dict(links)
+        return iter_links_list(links)
+
     _links = []
-    for key, value in links.iteritems():
-        ## WARNING: We are not escaping links: which is the
-        ## proper way to handle the (rare) case in which there
-        ## is a < or > symbol in the URL?
-        _links.append('<{1}>; rel={0}'.format(key, value))
+    for item in iter_links(links):
+        url = item.pop('url')
+        parts = ['{key}="{value}"'.format(key=key, value=value)
+                 for key, value in item.iteritems()]
+        link = '<{0}>'.format(url)
+        if len(parts):
+            link = '{0}; {1}'.format(link, '; '.join(parts))
+        _links.append(link)
     return ', '.join(_links)
 
 
@@ -223,6 +256,14 @@ class ApiNgController(BaseController):
         response.headers['Content-Type'] = 'application/json; charset=utf-8'
         return data
 
+    def _get_context_link(self, name):
+        url = self._url('context/{0}'.format(name))
+        return {
+            'url': url,
+            'rel': 'http://www.w3.org/ns/json-ld#context',
+            'type': 'application/ld+json',
+        }
+
     @staticmethod
     def _json_default(o):
         if isinstance(o, datetime.datetime):
@@ -294,14 +335,6 @@ class ApiNgController(BaseController):
         else:
             raise ValueError("Invalid method name: {0}".format(name))
 
-    # def _check_access(self, name, data_dict=None):
-    #     """Wrapper around check_access, automatically getting context"""
-
-    #     ## todo: which exception do this thing return?
-    #     ## if that's the case, catch and reraise a 403
-    #     context = self._get_context()
-    #     return logic.check_access('package_list', context, data_dict)
-
     def _set_cors(self):
         ## Do not set CORS headers on every page!!
         pass
@@ -349,6 +382,16 @@ class ApiNgController(BaseController):
             'user': user,
         }
         return info
+
+    @check_auth('read:context:id={0}')
+    def get_context(name):
+        from .jsonld import CONTEXTS, RDF_NAMESPACES
+        try:
+            context = CONTEXTS[name].copy()
+        except KeyError:
+            raise HTTPNotFound("No context with this name")
+        context.update(RDF_NAMESPACES)
+        return context
 
     @check_auth('read:package:index')
     def get_package_index(self):
@@ -426,7 +469,12 @@ class ApiNgController(BaseController):
 
     @check_auth('read:package:id={0}')
     def get_package(self, res_id):
-        pass
+        headers = {
+            'Link': _format_link_header([
+                self._get_context_link('package')]),
+        }
+        package = {}
+        return package, 200, headers
 
     @check_auth('create:package')
     def post_package_index(self):
