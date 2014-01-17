@@ -5,6 +5,14 @@ The API is somehow in between a RESTful and a RPC-like API, mainly
 to provide compatibility for clients not supporting 100% of the HTTP.
 
 
+Namespacing
+===========
+
+The whole set of API paths is usually installed under a "prefix", to provide
+namespacing. The default is ``/api/ng``, you can change that by using the
+``api_ng.base_url`` configuration variable.
+
+
 Serialization format(s)
 =======================
 
