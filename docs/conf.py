@@ -81,13 +81,15 @@ exclude_patterns = ['_build']
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+# pygments_style = 'sphinx'
+# pygments_style = 'monokai'
+pygments_style = 'solarizeddark'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
 
-# -- Options for HTML output ---------------------------------------------------
+# -- Options for HTML output --------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
@@ -96,7 +98,51 @@ html_theme = 'default'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+
+color_base03 = '#002b36'
+color_base02 = '#073642'
+color_base01 = '#586e75'
+color_base00 = '#657b83'
+color_base0 = '#839496'
+color_base1 = '#93a1a1'
+color_base2 = '#eee8d5'
+color_base3 = '#fdf6e3'
+color_yellow = '#b58900'
+color_orange = '#cb4b16'
+color_red = '#dc322f'
+color_magenta = '#d33682'
+color_violet = '#6c71c4'
+color_blue = '#268bd2'
+color_cyan = '#2aa198'
+color_green = '#859900'
+
+html_theme_options = {
+    'footerbgcolor': color_base03,
+    'footertextcolor': color_base1,
+
+    'sidebarbgcolor': color_base01,
+    'sidebarbtncolor': color_base1,
+    'sidebartextcolor': color_base2,
+    'sidebarlinkcolor': color_base2,
+
+    'relbarbgcolor': color_base02,
+    'relbartextcolor': color_base1,
+    'relbarlinkcolor': color_base2,
+
+    'bgcolor': color_base3,
+    'textcolor': color_base03,
+    'linkcolor': color_base02,
+    'visitedlinkcolor': color_base02,
+
+    'headbgcolor': color_base2,
+    'headtextcolor': color_base03,
+    'headlinkcolor': color_red,
+
+    'codebgcolor': color_base03,
+    'codetextcolor': color_base3,
+    # 'bodyfont': '',
+    # 'headfont': '',
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
