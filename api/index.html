@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Ckan API NG 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Ckan API NG 0.1a documentation" href="../index.html" />
+    <link rel="next" title="Endpoints" href="endpoints.html" />
+    <link rel="prev" title="Welcome to Ckan API NG’s documentation!" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="endpoints.html" title="Endpoints"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Welcome to Ckan API NG’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Ckan API NG 0.1a documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>The API is somehow in between a RESTful and a RPC-like API, mainly
+to provide compatibility for clients not supporting 100% of the HTTP.</p>
+<div class="section" id="serialization-format-s">
+<h2>Serialization format(s)<a class="headerlink" href="#serialization-format-s" title="Permalink to this headline">¶</a></h2>
+<p>Right now the only format &#8220;spoken&#8221; by the API is json.
+There are plans for:</p>
+<ul class="simple">
+<li>full json-ld suppport</li>
+<li>rdf (xml, turtle, n3, ..)</li>
+<li>(maybe) msgpack, protobuf, ...</li>
+</ul>
+</div>
+<div class="section" id="pagination">
+<h2>Pagination<a class="headerlink" href="#pagination" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>All the pagination is handled using the <tt class="docutils literal"><span class="pre">start</span></tt> and <tt class="docutils literal"><span class="pre">size</span></tt> query arguments.</li>
+<li>Pagination links are returned in the <tt class="docutils literal"><span class="pre">Link:</span></tt> header</li>
+<li><strong>todo:</strong> we need to figure out some way to pass total count back.</li>
+</ul>
+</div>
+<div class="section" id="sorting">
+<h2>Sorting<a class="headerlink" href="#sorting" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Sorting is controlled by the <tt class="docutils literal"><span class="pre">order_by</span></tt> query argument.</li>
+<li>The format is <tt class="docutils literal"><span class="pre">&lt;field&gt;[,&lt;direction&gt;]</span></tt> where direction can be one of <tt class="docutils literal"><span class="pre">ASC</span></tt>
+or <tt class="docutils literal"><span class="pre">DESC</span></tt>. If none is specified, <tt class="docutils literal"><span class="pre">ASC</span></tt> is assumed.</li>
+<li>Can be used multiple times to add more than one sorting column</li>
+<li>Example: <tt class="docutils literal"><span class="pre">GET</span> <span class="pre">/package?order_by=author,ASC&amp;order_by=date,DESC</span></tt></li>
+</ul>
+</div>
+<div class="section" id="authentication">
+<h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
+<p>Right now, the only supported authentication method is <tt class="docutils literal"><span class="pre">Basic</span></tt> http authentication,
+on username + api key.</p>
+<p>While this kind of authentication is supported by most clients, it can be recreated
+by setting the <tt class="docutils literal"><span class="pre">Authorization:</span></tt> header to <tt class="docutils literal"><span class="pre">Basic</span> <span class="pre">{value}</span></tt> where <tt class="docutils literal"><span class="pre">{value}</span></tt> is
+the base-64 encoded representation of <tt class="docutils literal"><span class="pre">username:apikey</span></tt>.</p>
+<p>There are plans for some &#8220;better&#8221; authentication mechanism, that doesn&#8217;t send
+the &#8220;private&#8221; API key along with each request, but instead uses it to sign
+requests (via something like <a class="reference external" href="http://pythonhosted.org/itsdangerous/">itsdangerous</a>,
+or HMAC signature anyways..).</p>
+</div>
+<div class="section" id="fields-selection">
+<h2>Fields selection<a class="headerlink" href="#fields-selection" title="Permalink to this headline">¶</a></h2>
+<p>Most &#8220;index&#8221; pages allow fields selection. This is done by specifying a comma-separated
+list of field names in the <tt class="docutils literal"><span class="pre">?fields=</span></tt> argument.</p>
+<div class="section" id="special-cases">
+<h3>Special cases<a class="headerlink" href="#special-cases" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>The <tt class="docutils literal"><span class="pre">link</span></tt> field is &#8220;virtual&#8221;: if requested for, it will be the (relative) link
+to the object itself, where applicable.</li>
+<li>If just <strong>one</strong> field is requested, and it is one of <tt class="docutils literal"><span class="pre">id</span></tt>, <tt class="docutils literal"><span class="pre">name</span></tt> or <tt class="docutils literal"><span class="pre">link</span></tt>,
+just a list of that field values will be returned, instead of a list of dictionaries.</li>
+<li>You can specify <tt class="docutils literal"><span class="pre">all</span></tt> to mean &#8220;all fields&#8221;. This can be of course combined with
+<tt class="docutils literal"><span class="pre">link</span></tt>, to get links in addition to all fields.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="rdf-and-json-ld">
+<h2>RDF and Json-LD<a class="headerlink" href="#rdf-and-json-ld" title="Permalink to this headline">¶</a></h2>
+<p>This part is Work in progress, and decisions must be made about it.</p>
+</div>
+<div class="section" id="compatibility">
+<h2>Compatibility<a class="headerlink" href="#compatibility" title="Permalink to this headline">¶</a></h2>
+<p>Since there are a lot of clients out there that still doesn&#8217;t support all HTTP
+methods / make it difficult manipulating headers, we provide some &#8220;compatibility&#8221;
+arguments to &#8220;emulate&#8221; other requests via HTTP POST.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">?method=&lt;NAME&gt;</span></tt> pretend we&#8217;re making a request of this type</li>
+<li><tt class="docutils literal"><span class="pre">?metadata_in_body=true</span></tt> if set to <tt class="docutils literal"><span class="pre">true</span></tt>, return &#8220;metadata&#8221; (such as
+pagination information) in the content body. The actual returned object will
+be moved under the <tt class="docutils literal"><span class="pre">result</span></tt> key; extra information will be added.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#serialization-format-s">Serialization format(s)</a></li>
+<li><a class="reference internal" href="#pagination">Pagination</a></li>
+<li><a class="reference internal" href="#sorting">Sorting</a></li>
+<li><a class="reference internal" href="#authentication">Authentication</a></li>
+<li><a class="reference internal" href="#fields-selection">Fields selection</a><ul>
+<li><a class="reference internal" href="#special-cases">Special cases</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rdf-and-json-ld">RDF and Json-LD</a></li>
+<li><a class="reference internal" href="#compatibility">Compatibility</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../index.html"
+                        title="previous chapter">Welcome to Ckan API NG&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="endpoints.html"
+                        title="next chapter">Endpoints</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="endpoints.html" title="Endpoints"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Welcome to Ckan API NG’s documentation!"
+             >previous</a> |</li>
+        <li><a href="../index.html">Ckan API NG 0.1a documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Samuele Santi.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>
