@@ -68,39 +68,37 @@
 <span class="na">Server</span><span class="o">:</span> <span class="l">PasteWSGIServer/0.5 Python/2.7.3</span>
 </pre></div>
 </div>
-<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s2">&quot;GET /help&quot;</span><span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="s2">&quot;Return documentation about available API resources&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/get_help_index&quot;</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;GET /help/{id}&quot;</span><span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="s2">&quot;Get help about a given api call&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/get_help&quot;</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;GET /package&quot;</span><span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="s2">&quot;Return list of packages (datasets).\n\n:param start:\n:param size:&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/get_package_index&quot;</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;GET /package/{id}&quot;</span><span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
-        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/get_package&quot;</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;POST /package&quot;</span><span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="s2">&quot;Create a new dataset&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/post_package_index&quot;</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;PATCH /package/{id}&quot;</span><span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
-        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/patch_package&quot;</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;DELETE /package/{id}&quot;</span><span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
-        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/delete_package&quot;</span>
-    <span class="p">},</span>
-    <span class="c1">// ...</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
+<div class="highlight-json"><pre>{
+    "GET /help": {
+        "doc": "Return documentation about available API resources",
+        "help_url": "/api/ng/help/get_help_index"
+    },
+    "GET /help/{id}": {
+        "doc": "Get help about a given api call",
+        "help_url": "/api/ng/help/get_help"
+    },
+    "GET /package": {
+        "doc": "Return list of packages (datasets).\n\n:param start:\n:param size:",
+        "help_url": "/api/ng/help/get_package_index"
+    },
+    "GET /package/{id}": {
+        "doc": null,
+        "help_url": "/api/ng/help/get_package"
+    },
+    "POST /package": {
+        "doc": "Create a new dataset",
+        "help_url": "/api/ng/help/post_package_index"
+    },
+    "PATCH /package/{id}": {
+        "doc": null,
+        "help_url": "/api/ng/help/patch_package"
+    },
+    "DELETE /package/{id}": {
+        "doc": null,
+        "help_url": "/api/ng/help/delete_package"
+    },
+    // ...
+}</pre>
 </div>
 </div>
 </div>
