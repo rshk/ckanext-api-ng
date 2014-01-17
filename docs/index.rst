@@ -12,7 +12,7 @@ Public API documentation:
    :maxdepth: 2
 
    api/index
-   api/endpoints
+   api/endpoints/index
 
 
 Indices and tables
