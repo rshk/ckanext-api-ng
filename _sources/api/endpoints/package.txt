@@ -1,5 +1,5 @@
-Endpoints
-#########
+Packages and resources
+######################
 
 All the API are nested under a prefix, usually ``/api/ng/``.
 
@@ -40,16 +40,3 @@ Methods
 * WIP ``PUT /resource/<id>`` -> full update of a packa
 * WIP ``PATCH /resource/<id>`` -> partial update of a resource
 * WIP ``DELETE /resource/<id>`` -> delete a resource
-
-
-``vocabulary``
-==============
-
-Manage tag vocabularies.
-
-* WIP ``GET /vocabulary`` -> list vocabularies
-* WIP ``POST /vocabulary`` -> create vocabulary
-* WIP ``DELETE /vocabulary`` -> delete vocabulary
-* WIP ``GET /vocabulary/<id>`` -> list tags in this vocabulary
-* WIP ``POST /vocabulary/<id>`` -> add tag in this vocabulary
-* WIP ``DELETE /vocabulary/<id>/<tag_id>`` -> delete tag from this vocabulary
