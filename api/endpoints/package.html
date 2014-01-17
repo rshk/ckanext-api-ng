@@ -94,6 +94,102 @@ maintainer, maintainer_email, notes, owner_org, type, url</li>
 </ul>
 </div>
 </div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="getting-list-of-datasets">
+<h3>Getting list of datasets<a class="headerlink" href="#getting-list-of-datasets" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">%</span> http <span class="s1">&#39;http://127.0.0.1:5001/api/ng/package?size=5&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Cache-Control</span><span class="o">:</span> <span class="l">no-cache</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">593</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json; charset=utf-8</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Fri, 17 Jan 2014 10:35:25 GMT</span>
+<span class="na">Link</span><span class="o">:</span> <span class="l">&lt;/api/ng/package?start=0&amp;fields=id%2Cname%2Ctitle&amp;size=5&gt;; rel=first,</span>
+    <span class="l">&lt;/api/ng/package?start=580&amp;fields=id%2Cname%2Ctitle&amp;size=5&gt;; rel=last,</span>
+    <span class="l">&lt;/api/ng/package?start=5&amp;fields=id%2Cname%2Ctitle&amp;size=5&gt;; rel=next</span>
+<span class="na">Pragma</span><span class="o">:</span> <span class="l">no-cache</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">PasteWSGIServer/0.5 Python/2.7.3</span>
+<span class="na">x-page-size</span><span class="o">:</span> <span class="l">5</span>
+<span class="na">x-page-start</span><span class="o">:</span> <span class="l">0</span>
+<span class="na">x-result-total</span><span class="o">:</span> <span class="l">583</span>
+</pre></div>
+</div>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;02d09ad1-34d6-462f-932b-ee8a9ede9993&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;example-dataset-0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="o">:</span> <span class="s2">&quot;Example dataset #0&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;771e7b45-58c9-4126-9688-f01e1a2f3d80&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;example-dataset-1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="o">:</span> <span class="s2">&quot;Example dataset #1&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;3074389b-34ee-4bb2-886c-fec45bd00d76&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;example-dataset-2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="o">:</span> <span class="s2">&quot;Example dataset #2&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;7027c0a1-dc9e-4ec6-b846-0c5cc622a5a0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;example-dataset-3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="o">:</span> <span class="s2">&quot;Example dataset #3&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;9aecb103-f286-45ec-9bbc-7b1dd0926b59&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;example-dataset-4&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="o">:</span> <span class="s2">&quot;Example dataset #4&quot;</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="getting-links-to-datasets">
+<h3>Getting links to datasets<a class="headerlink" href="#getting-links-to-datasets" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">%</span> http <span class="s1">&#39;http://127.0.0.1:5001/api/ng/package?fields=link&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Cache-Control</span><span class="o">:</span> <span class="l">no-cache</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">1192</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json; charset=utf-8</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Fri, 17 Jan 2014 10:41:19 GMT</span>
+<span class="na">Link</span><span class="o">:</span> <span class="l">&lt;/api/ng/package?start=0&amp;fields=id&amp;size=20&gt;; rel=first, &lt;/api/ng/package?start=580&amp;fields=id&amp;size=20&gt;; rel=last, &lt;/api/ng/package?start=20&amp;fields=id&amp;size=20&gt;; rel=next</span>
+<span class="na">Pragma</span><span class="o">:</span> <span class="l">no-cache</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">PasteWSGIServer/0.5 Python/2.7.3</span>
+<span class="na">x-page-size</span><span class="o">:</span> <span class="l">20</span>
+<span class="na">x-page-start</span><span class="o">:</span> <span class="l">0</span>
+<span class="na">x-result-total</span><span class="o">:</span> <span class="l">583</span>
+</pre></div>
+</div>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">[</span>
+    <span class="s2">&quot;/api/ng/package/02d09ad1-34d6-462f-932b-ee8a9ede9993&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/771e7b45-58c9-4126-9688-f01e1a2f3d80&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/3074389b-34ee-4bb2-886c-fec45bd00d76&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/7027c0a1-dc9e-4ec6-b846-0c5cc622a5a0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/9aecb103-f286-45ec-9bbc-7b1dd0926b59&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/7b513174-f80a-442b-a7ae-c63cbcb9c6cb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/d9d59e1b-a67b-4ae1-8086-2b9088240fd3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/7e84ae8b-9457-44fe-a68f-594a7cde8525&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/467928ee-4446-44d7-bbb4-0f0484f0ca7d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/c7e09ed3-b948-452f-a3d7-922fa34359d2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/5d8e2dfa-0eb4-41ea-a1fb-f032550b0533&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/d9239daf-6ea0-4d90-8271-9eafc1235490&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/7c2d1fa0-c0cb-4f52-970a-ac57c720f57a&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/f0d5765f-7170-4af0-9819-72a078af1811&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/06b70d1d-79db-4bc1-a09d-13a35244f4b9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/0b98e9a5-0077-470c-b4f4-88bb1ed32d06&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/515a211a-1e96-40b0-a2ff-73cd53ec6ac3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/87aa0dc9-459d-418d-a738-b128a136fe35&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/c91919b4-48bb-455a-8715-c6fd06a66414&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/api/ng/package/cf080127-6696-4914-a0f4-fe69277b9a14&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 
 
@@ -112,6 +208,11 @@ maintainer, maintainer_email, notes, owner_org, type, url</li>
 </li>
 <li><a class="reference internal" href="#resource"><tt class="docutils literal"><span class="pre">resource</span></tt></a><ul>
 <li><a class="reference internal" href="#id1">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#getting-list-of-datasets">Getting list of datasets</a></li>
+<li><a class="reference internal" href="#getting-links-to-datasets">Getting links to datasets</a></li>
 </ul>
 </li>
 </ul>

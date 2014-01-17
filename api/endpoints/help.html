@@ -56,7 +56,7 @@
 <p>The <tt class="docutils literal"><span class="pre">help</span></tt> endpoint provides information about available endpoints.</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">%</span> http http://127.0.0.1:5000/api/ng/help
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">%</span> http <span class="s1">&#39;http://127.0.0.1:5000/api/ng/help&#39;</span>
 </pre></div>
 </div>
 <div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span> <span class="m">200</span> <span class="ne">OK</span>
@@ -68,37 +68,61 @@
 <span class="na">Server</span><span class="o">:</span> <span class="l">PasteWSGIServer/0.5 Python/2.7.3</span>
 </pre></div>
 </div>
-<div class="highlight-json"><pre>{
-    "GET /help": {
-        "doc": "Return documentation about available API resources",
-        "help_url": "/api/ng/help/get_help_index"
-    },
-    "GET /help/{id}": {
-        "doc": "Get help about a given api call",
-        "help_url": "/api/ng/help/get_help"
-    },
-    "GET /package": {
-        "doc": "Return list of packages (datasets).\n\n:param start:\n:param size:",
-        "help_url": "/api/ng/help/get_package_index"
-    },
-    "GET /package/{id}": {
-        "doc": null,
-        "help_url": "/api/ng/help/get_package"
-    },
-    "POST /package": {
-        "doc": "Create a new dataset",
-        "help_url": "/api/ng/help/post_package_index"
-    },
-    "PATCH /package/{id}": {
-        "doc": null,
-        "help_url": "/api/ng/help/patch_package"
-    },
-    "DELETE /package/{id}": {
-        "doc": null,
-        "help_url": "/api/ng/help/delete_package"
-    },
-    // ...
-}</pre>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;GET /help&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="s2">&quot;Return documentation about available API resources&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/get_help_index&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;GET /help/{id}&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="s2">&quot;Get help about a given api call&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/get_help&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;GET /package&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="s2">&quot;Return list of packages (datasets).\n\n:param start:\n:param size:&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/get_package_index&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;GET /package/{id}&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="s2">&quot;Get a package metadata, by id&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/get_package&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;POST /package&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="s2">&quot;Create a new dataset&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/post_package_index&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;PATCH /package/{id}&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/patch_package&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;DELETE /package/{id}&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/delete_package&quot;</span>
+    <span class="p">},</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="help-about-a-given-method">
+<h3>Help about a given method<a class="headerlink" href="#help-about-a-given-method" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">%</span> http <span class="s1">&#39;http://127.0.0.1:5001/api/ng/help/get_package&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-http"><div class="highlight"><pre><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Cache-Control</span><span class="o">:</span> <span class="l">no-cache</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">83</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json; charset=utf-8</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Fri, 17 Jan 2014 10:31:34 GMT</span>
+<span class="na">Pragma</span><span class="o">:</span> <span class="l">no-cache</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">PasteWSGIServer/0.5 Python/2.7.3</span>
+</pre></div>
+</div>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;doc&quot;</span><span class="o">:</span> <span class="s2">&quot;Get a package metadata, by id&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;help_url&quot;</span><span class="o">:</span> <span class="s2">&quot;/api/ng/help/get_package&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;title&quot;</span><span class="o">:</span> <span class="s2">&quot;GET /package/{id}&quot;</span><span class="p">,</span>
+    <span class="c1">// additional info can be added here</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -112,7 +136,10 @@
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Help and documentation</a><ul>
-<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#help-about-a-given-method">Help about a given method</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

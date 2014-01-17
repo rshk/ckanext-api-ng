@@ -8,7 +8,7 @@ Examples
 
 .. code-block:: console
 
-    % http http://127.0.0.1:5000/api/ng/help
+    % http 'http://127.0.0.1:5000/api/ng/help'
 
 
 .. code-block:: http
@@ -21,7 +21,7 @@ Examples
     Pragma: no-cache
     Server: PasteWSGIServer/0.5 Python/2.7.3
 
-.. code-block:: json
+.. code-block:: javascript
 
     {
         "GET /help": {
@@ -37,7 +37,7 @@ Examples
             "help_url": "/api/ng/help/get_package_index"
         },
         "GET /package/{id}": {
-            "doc": null,
+            "doc": "Get a package metadata, by id",
             "help_url": "/api/ng/help/get_package"
         },
         "POST /package": {
@@ -53,4 +53,31 @@ Examples
             "help_url": "/api/ng/help/delete_package"
         },
 	// ...
+    }
+
+
+Help about a given method
+-------------------------
+
+.. code-block:: console
+
+    % http 'http://127.0.0.1:5001/api/ng/help/get_package'
+
+.. code-block:: http
+
+    HTTP/1.0 200 OK
+    Cache-Control: no-cache
+    Content-Length: 83
+    Content-Type: application/json; charset=utf-8
+    Date: Fri, 17 Jan 2014 10:31:34 GMT
+    Pragma: no-cache
+    Server: PasteWSGIServer/0.5 Python/2.7.3
+
+.. code-block:: javascript
+
+    {
+        "doc": "Get a package metadata, by id",
+        "help_url": "/api/ng/help/get_package",
+        "title": "GET /package/{id}",
+        // additional info can be added here
     }
