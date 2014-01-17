@@ -21,7 +21,7 @@ Examples
     Pragma: no-cache
     Server: PasteWSGIServer/0.5 Python/2.7.3
 
-.. code-block:: javascript
+.. code-block:: json
 
     {
         "GET /help": {
@@ -53,5 +53,4 @@ Examples
             "help_url": "/api/ng/help/delete_package"
         },
 	// ...
-        }
     }

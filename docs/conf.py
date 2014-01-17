@@ -140,6 +140,7 @@ html_theme_options = {
 
     'codebgcolor': color_base03,
     'codetextcolor': color_base3,
+
     # 'bodyfont': '',
     # 'headfont': '',
 }
