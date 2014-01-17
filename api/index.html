@@ -53,6 +53,12 @@
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>The API is somehow in between a RESTful and a RPC-like API, mainly
 to provide compatibility for clients not supporting 100% of the HTTP.</p>
+<div class="section" id="namespacing">
+<h2>Namespacing<a class="headerlink" href="#namespacing" title="Permalink to this headline">¶</a></h2>
+<p>The whole set of API paths is usually installed under a &#8220;prefix&#8221;, to provide
+namespacing. The default is <tt class="docutils literal"><span class="pre">/api/ng</span></tt>, you can change that by using the
+<tt class="docutils literal"><span class="pre">api_ng.base_url</span></tt> configuration variable.</p>
+</div>
 <div class="section" id="serialization-format-s">
 <h2>Serialization format(s)<a class="headerlink" href="#serialization-format-s" title="Permalink to this headline">¶</a></h2>
 <p>Right now the only format &#8220;spoken&#8221; by the API is json.
@@ -136,6 +142,7 @@ be moved under the <tt class="docutils literal"><span class="pre">result</span><
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#namespacing">Namespacing</a></li>
 <li><a class="reference internal" href="#serialization-format-s">Serialization format(s)</a></li>
 <li><a class="reference internal" href="#pagination">Pagination</a></li>
 <li><a class="reference internal" href="#sorting">Sorting</a></li>
