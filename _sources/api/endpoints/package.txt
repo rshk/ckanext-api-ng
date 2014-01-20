@@ -19,7 +19,7 @@ Methods
 * ``GET /package`` -> list packages
 * ``GET /package/<id>`` -> get the specified package
 * WIP ``POST /package`` -> create new package
-* WIP ``PUT /package/<id>`` -> full update of a packa
+* WIP ``PUT /package/<id>`` -> full update of a package
 * WIP ``PATCH /package/<id>`` -> partial update of a package
 * WIP ``DELETE /package/<id>`` -> delete a package
 
@@ -37,7 +37,7 @@ Methods
 
 * WIP ``GET /resource/<id>`` -> get the specified resource
 * WIP ``POST /resource`` -> create new resource
-* WIP ``PUT /resource/<id>`` -> full update of a packa
+* WIP ``PUT /resource/<id>`` -> full update of a resource
 * WIP ``PATCH /resource/<id>`` -> partial update of a resource
 * WIP ``DELETE /resource/<id>`` -> delete a resource
 

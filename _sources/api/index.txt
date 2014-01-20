@@ -45,17 +45,32 @@ Sorting
 Authentication
 ==============
 
-Right now, the only supported authentication method is ``Basic`` http authentication,
-on username + api key.
+Right now, we only support ``Basic`` http authentication, using the api key as
+password.
 
-While this kind of authentication is supported by most clients, it can be recreated
-by setting the ``Authorization:`` header to ``Basic {value}`` where ``{value}`` is
-the base-64 encoded representation of ``username:apikey``.
+While this kind of authentication is supported by most HTTP clients, it can
+be recreated by setting the ``Authorization:`` header to ``Basic {value}``
+where ``{value}`` is the base-64 encoded representation of ``username:apikey``.
 
 There are plans for some "better" authentication mechanism, that doesn't send
 the "private" API key along with each request, but instead uses it to sign
 requests (via something like `itsdangerous <http://pythonhosted.org/itsdangerous/>`_,
 or HMAC signature anyways..).
+
+Authorization
+=============
+
+Right now, permissions checking is as follows:
+
+- Anybody can read anything [#auth1]_
+- To write (create|update|delete) you must log in as a sysadmin user [#auth2]_
+
+.. [#auth1] A part from logically deleted items that are simple **not**
+    accessible to anyone. A separate "admin" API to handle them might
+    be added in the future.
+
+.. [#auth2] This is of course sub-optimal and there are plans for fixing that,
+    but for the moment it was the quickest way.
 
 
 Fields selection
@@ -78,11 +93,14 @@ Special cases
 RDF and Json-LD
 ===============
 
-This part is Work in progress, and decisions must be made about it.
+.. note::
+    This part is Work in progress, and decisions must be made about it.
 
 
 Compatibility
 =============
+
+.. note:: This is not implemented yet
 
 Since there are a lot of clients out there that still doesn't support all HTTP
 methods / make it difficult manipulating headers, we provide some "compatibility"
